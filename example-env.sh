@@ -1,0 +1,1 @@
+export DBUrl="postgres://postgres:12345@localhost:5432/loanservice?sslmode=disable"
