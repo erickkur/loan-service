@@ -15,12 +15,9 @@ import (
 	"github.com/loan-service/internal/logger"
 
 	pg "github.com/loan-service/adapter/database/postgres"
-	hModel "github.com/loan-service/adapter/models/human"
 	lModel "github.com/loan-service/adapter/models/loan"
-	hService "github.com/loan-service/application/services/human"
 	lService "github.com/loan-service/application/services/loan"
 	rs "github.com/loan-service/application/services/router"
-	hDomain "github.com/loan-service/domain/human"
 	lDomain "github.com/loan-service/domain/loan"
 )
 
@@ -53,7 +50,6 @@ func run() error {
 	middlewareAdapter := middleware.NewAdapter()
 	postgresAdapter := pg.NewAdapter(infraObj.Database)
 
-	humanModel := hModel.NewModel()
 	loanModel := lModel.NewModel()
 	// ++++++++++++++++++++++++++++++++++++++++++
 
@@ -65,11 +61,6 @@ func run() error {
 		middlewareAdapter,
 		"/api")
 
-	humanService := hService.NewHumanService(hService.Dependency{
-		HumanModel: humanModel,
-		DBClient:   postgresAdapter,
-	})
-
 	loanService := lService.NewLoanService(lService.Dependency{
 		LoanModel: loanModel,
 		DBClient:  postgresAdapter,
@@ -78,12 +69,6 @@ func run() error {
 
 	// Domain layer initialization
 	// ++++++++++++++++++++++++++++++++++++++++++
-	hDomain.NewDomain(hDomain.RouteDependency{
-		HumanService: humanService,
-		Context:      routerService,
-		Logger:       log,
-	})
-
 	lDomain.NewDomain(lDomain.RouteDependency{
 		LoanService: loanService,
 		Context:     routerService,
