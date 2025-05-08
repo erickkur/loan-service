@@ -5,6 +5,7 @@ import (
 
 	"github.com/loan-service/adapter/httpserver"
 	ma "github.com/loan-service/adapter/middleware"
+	cs "github.com/loan-service/internal/constant"
 	"github.com/loan-service/internal/handler"
 	"github.com/thoas/go-funk"
 )
@@ -22,7 +23,7 @@ type EndpointInfo struct {
 	HTTPMethod    string
 	URLPattern    string
 	Handler       handler.EndpointHandler
-	Verifications []ma.VerificationType
+	Verifications []cs.VerificationType
 }
 
 func NewService(router httpserver.RouterInterface, helper httpserver.HelperInterface, middleware ma.Middleware, prefix string) Context {
@@ -49,10 +50,10 @@ func (r *Context) RegisterEndpointWithPrefix(info EndpointInfo, prefix string) {
 	r.router.Handle(info.HTTPMethod, urlPattern, m.Verify(info.Handler, verificationFns...))
 }
 
-func getVerificationMethod(m *ma.Middleware, verifications []ma.VerificationType) []ma.MiddlewareFunc {
-	return funk.Map(verifications, func(t ma.VerificationType) ma.MiddlewareFunc {
+func getVerificationMethod(m *ma.Middleware, verifications []cs.VerificationType) []ma.MiddlewareFunc {
+	return funk.Map(verifications, func(t cs.VerificationType) ma.MiddlewareFunc {
 		switch t {
-		case ma.VerificationTypeConstants.InternalToolToken:
+		case cs.VerificationTypeConstants.InternalToolToken:
 			return m.InternalToolToken
 		default:
 			return m.AppToken

@@ -3,9 +3,9 @@ package human
 import (
 	"net/http"
 
-	ma "github.com/loan-service/adapter/middleware"
 	"github.com/loan-service/application/services/human"
 	rs "github.com/loan-service/application/services/router"
+	cs "github.com/loan-service/internal/constant"
 	"github.com/loan-service/internal/logger"
 )
 
@@ -44,8 +44,8 @@ func (r HumanRoute) GetHumans(h Handler) rs.EndpointInfo {
 		HTTPMethod: http.MethodGet,
 		URLPattern: "/humans",
 		Handler:    h.GetHumans(),
-		Verifications: []ma.VerificationType{
-			ma.VerificationTypeConstants.AppToken,
+		Verifications: []cs.VerificationType{
+			cs.VerificationTypeConstants.AppToken,
 		},
 	}
 }

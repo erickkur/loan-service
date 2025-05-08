@@ -8,7 +8,7 @@ import (
 )
 
 type Human struct {
-	ID   int    `pg:",pk" json:"id"`
+	ID   int    `bun:",pk,autoincrement"`
 	Name string `json:"name"`
 
 	bun.BaseModel `bun:"humans,alias:h"`

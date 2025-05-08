@@ -1,0 +1,39 @@
+package loan
+
+import (
+	"github.com/loan-service/application/dto"
+	lService "github.com/loan-service/application/services/loan"
+	errs "github.com/loan-service/internal/error"
+)
+
+type EntityDependency struct {
+	LoanService lService.LoanServiceInterface
+}
+
+type Entity struct {
+	loanService lService.LoanServiceInterface
+}
+
+func NewEntity(d EntityDependency) Entity {
+	return Entity{
+		loanService: d.LoanService,
+	}
+}
+
+func (l Entity) CreateLoan(request dto.CreateLoanRequest) (*dto.CreateLoanResponse, *errs.JSONWrapError) {
+	err := request.Validate()
+	if err != nil {
+		jsonWrapErr := errs.NewValidationError(err).WrapError(errs.LoanPrefix)
+		return nil, &jsonWrapErr
+	}
+
+	loan, err := l.loanService.CreateLoan(request)
+	if err != nil {
+		jsonWrapErr := errs.NewDatabaseError(err).WrapError(errs.LoanPrefix)
+		return nil, &jsonWrapErr
+	}
+
+	return &dto.CreateLoanResponse{
+		ID: loan.ID,
+	}, nil
+}

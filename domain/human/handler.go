@@ -27,7 +27,7 @@ func NewHandler(d HandlerDependency) Handler {
 		human:  d.Human,
 		logger: d.Logger,
 		helper: d.Helper,
-		resp:   handler.NewResponse(handler.Dep{}),
+		resp:   handler.NewResponse(handler.Dep{Log: d.Logger}),
 	}
 }
 
