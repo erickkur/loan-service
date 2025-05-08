@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/loan-service/infra/way"
+	"github.com/loan-service/internal/logger"
 )
 
 type RouterInterface interface {
@@ -18,6 +19,7 @@ type Router struct {
 // Adapter ...
 type Adapter struct {
 	Router *way.Router
+	Log    logger.Interface
 }
 
 func NewAdapter(a *Adapter) *Router {

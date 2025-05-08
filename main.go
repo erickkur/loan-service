@@ -12,6 +12,7 @@ import (
 	"github.com/loan-service/adapter/middleware"
 	"github.com/loan-service/infra"
 	"github.com/loan-service/internal/env"
+	"github.com/loan-service/internal/logger"
 
 	pg "github.com/loan-service/adapter/database/postgres"
 	hModel "github.com/loan-service/adapter/models/human"
@@ -31,6 +32,9 @@ func main() {
 func run() error {
 	addr := flag.String("addr", env.AppPort(), "http service address")
 
+	// Internal shared package
+	log := logger.New()
+
 	// Infra layer initialization
 	// ++++++++++++++++++++++++++++++++++++++++++
 	infraObj := infra.Init()
@@ -41,6 +45,7 @@ func run() error {
 	// ++++++++++++++++++++++++++++++++++++++++++
 	httpServerAdapter := httpserver.NewAdapter(&httpserver.Adapter{
 		Router: infraObj.Router,
+		Log:    log,
 	})
 	middlewareAdapter := middleware.NewAdapter()
 	humanModel := hModel.NewModel()
@@ -66,6 +71,7 @@ func run() error {
 	hDomain.NewDomain(hDomain.RouteDependency{
 		HumanService: humanService,
 		Context:      routerService,
+		Logger:       log,
 	})
 	// ++++++++++++++++++++++++++++++++++++++++++
 
@@ -78,7 +84,7 @@ func run() error {
 		Handler:      infraObj.Router,
 	}
 
-	fmt.Println("Loan service started on port", env.AppPort())
+	log.Info(fmt.Sprint("Loan service started on port", env.AppPort()))
 
 	return s.ListenAndServe()
 }
