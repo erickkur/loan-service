@@ -3,6 +3,9 @@ package handler
 import (
 	"fmt"
 	"net/http"
+
+	internalError "github.com/loan-service/internal/error"
+	"github.com/loan-service/internal/logger"
 )
 
 type HTTPResponse struct {
@@ -12,13 +15,17 @@ type HTTPResponse struct {
 	errCode   int
 	message   string
 	noContent bool
+	Logger    logger.Interface
 }
 
 type Dep struct {
+	Log logger.Interface
 }
 
 func NewResponse(dep Dep) *HTTPResponse {
-	return &HTTPResponse{}
+	return &HTTPResponse{
+		Logger: dep.Log,
+	}
 }
 
 // SetOk ...
@@ -62,11 +69,20 @@ func (res HTTPResponse) SetErrorWithStatus(status int, err error, errCode int, m
 }
 
 // ImportJSONWebError ...
-func (res HTTPResponse) ImportJSONWebError() HTTPResponse {
-	// res.status = err.Status
-	// res.err = err.Error
-	// res.errCode = err.Code
-	// res.message = err.Message
+func (res HTTPResponse) ImportJSONWrapError(err *internalError.JSONWrapError) HTTPResponse {
+	res.status = err.Status
+	res.err = err.Error
+	res.errCode = err.Code
+	res.message = err.Message
+
+	errStr := fmt.Sprintf(
+		"Error occured. %s",
+		err.StringWithError(),
+	)
+
+	if err.Status >= 500 {
+		res.Logger.Error(errStr)
+	}
 
 	return res
 }
