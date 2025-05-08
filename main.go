@@ -1,5 +1,84 @@
 package main
 
-func main() {
+import (
+	"flag"
+	"fmt"
+	"math/rand"
+	"net/http"
+	"os"
+	"time"
 
+	"github.com/loan-service/adapter/httpserver"
+	"github.com/loan-service/adapter/middleware"
+	"github.com/loan-service/infra"
+	"github.com/loan-service/internal/env"
+
+	pg "github.com/loan-service/adapter/database/postgres"
+	hModel "github.com/loan-service/adapter/models/human"
+	hService "github.com/loan-service/application/services/human"
+	rs "github.com/loan-service/application/services/router"
+	hDomain "github.com/loan-service/domain/human"
+)
+
+func main() {
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+	if err := run(); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	addr := flag.String("addr", env.AppPort(), "http service address")
+
+	// Infra layer initialization
+	// ++++++++++++++++++++++++++++++++++++++++++
+	infraObj := infra.Init()
+	infraObj.Database.Connect()
+	// ++++++++++++++++++++++++++++++++++++++++++
+
+	// Adapter layer initialization
+	// ++++++++++++++++++++++++++++++++++++++++++
+	httpServerAdapter := httpserver.NewAdapter(&httpserver.Adapter{
+		Router: infraObj.Router,
+	})
+	middlewareAdapter := middleware.NewAdapter()
+	humanModel := hModel.NewModel()
+	postgresAdapter := pg.NewAdapter(infraObj.Database)
+	// ++++++++++++++++++++++++++++++++++++++++++
+
+	// Service layer initialization
+	// ++++++++++++++++++++++++++++++++++++++++++
+	routerService := rs.NewService(
+		httpServerAdapter.Server,
+		httpserver.RouterHelper{},
+		middlewareAdapter,
+		"/api")
+
+	humanService := hService.NewHumanService(hService.Dependency{
+		HumanModel: humanModel,
+		DBClient:   postgresAdapter,
+	})
+	// ++++++++++++++++++++++++++++++++++++++++++
+
+	// Domain layer initialization
+	// ++++++++++++++++++++++++++++++++++++++++++
+	hDomain.NewDomain(hDomain.RouteDependency{
+		HumanService: humanService,
+		Context:      routerService,
+	})
+	// ++++++++++++++++++++++++++++++++++++++++++
+
+	infraObj.Router.ReArrange()
+
+	s := &http.Server{
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Addr:         *addr,
+		Handler:      infraObj.Router,
+	}
+
+	fmt.Println("Loan service started on port", env.AppPort())
+
+	return s.ListenAndServe()
 }

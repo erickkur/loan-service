@@ -1,2 +1,2 @@
 go build
-./loanservice
+./loan-service
