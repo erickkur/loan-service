@@ -3,7 +3,7 @@ BEGIN;
     (
         'proposed',
         'approved',
-        'interested',
+        'invested',
         'disbursed'
     );
     

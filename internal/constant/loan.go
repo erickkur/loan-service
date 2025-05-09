@@ -3,6 +3,6 @@ package constant
 const (
 	LoanStatusProposed  = "proposed"
 	LoanStatusApproved  = "approved"
-	LoanStatusInvested  = "interested"
+	LoanStatusInvested  = "invested"
 	LoanStatusDisbursed = "disbursed"
 )
