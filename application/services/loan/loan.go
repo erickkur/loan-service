@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/google/uuid"
 	pg "github.com/loan-service/adapter/database/postgres"
 	borrowerAdapter "github.com/loan-service/adapter/models/borrower"
 	employeeAdapter "github.com/loan-service/adapter/models/employee"
@@ -100,40 +101,6 @@ func (ls *LoanService) CreateLoan(ctx context.Context, request dto.CreateLoanReq
 	return createdLoan, nil
 }
 
-func evaluateLoanStatus(requestStatus string, currentStatus string) error {
-	if requestStatus == constant.LoanStatusApproved && currentStatus != constant.LoanStatusProposed {
-		return errs.CustomErrorInformation{
-			ErrorInformation: "loan status must be proposed for updating loan to approved",
-		}
-	}
-
-	if requestStatus == constant.LoanStatusDisbursed && currentStatus != constant.LoanStatusInvested {
-		return errs.CustomErrorInformation{
-			ErrorInformation: "loan status must be invested for updating loan to disbursed",
-		}
-	}
-
-	return nil
-}
-
-func buildLoanLogBaseLoanChangeStatus(requestStatus string, param LoanChangeStatusParam) loanlogAdapter.LoanLog {
-	if requestStatus == constant.LoanStatusApproved {
-		return loanlogAdapter.LoanLog{
-			LoanID:     int64(param.LoanID),
-			EmployeeID: sql.NullInt64{Valid: true, Int64: int64(param.EmployeeID)},
-			Status:     constant.LoanStatusApproved,
-			CreatedAt:  param.DateOfApproval,
-		}
-	}
-
-	return loanlogAdapter.LoanLog{
-		LoanID:     int64(param.LoanID),
-		EmployeeID: sql.NullInt64{Valid: true, Int64: int64(param.EmployeeID)},
-		Status:     constant.LoanStatusDisbursed,
-		CreatedAt:  param.DateOfDisbursement,
-	}
-}
-
 func (ls *LoanService) UpdateLoanToApprovedOrDisbursed(ctx context.Context, request dto.UpdateLoanRequest) (*loanAdapter.Loan, error) {
 	trxDB, err := ls.dbClient.BeginTransaction()
 	if err != nil {
@@ -208,4 +175,46 @@ func (ls *LoanService) UpdateLoanToApprovedOrDisbursed(ctx context.Context, requ
 	}
 
 	return loan, nil
+}
+
+func (ls *LoanService) GetLoanByGUID(ctx context.Context, loanGUID uuid.UUID) (*loanAdapter.Loan, error) {
+	return ls.loanModel.GetLoanByGUID(
+		ls.dbClient,
+		ctx,
+		loanGUID,
+	)
+}
+
+func evaluateLoanStatus(requestStatus string, currentStatus string) error {
+	if requestStatus == constant.LoanStatusApproved && currentStatus != constant.LoanStatusProposed {
+		return errs.CustomErrorInformation{
+			ErrorInformation: "current loan status must be proposed for updating loan to approved",
+		}
+	}
+
+	if requestStatus == constant.LoanStatusDisbursed && currentStatus != constant.LoanStatusInvested {
+		return errs.CustomErrorInformation{
+			ErrorInformation: "current loan status must be invested for updating loan to disbursed",
+		}
+	}
+
+	return nil
+}
+
+func buildLoanLogBaseLoanChangeStatus(requestStatus string, param LoanChangeStatusParam) loanlogAdapter.LoanLog {
+	if requestStatus == constant.LoanStatusApproved {
+		return loanlogAdapter.LoanLog{
+			LoanID:     int64(param.LoanID),
+			EmployeeID: sql.NullInt64{Valid: true, Int64: int64(param.EmployeeID)},
+			Status:     constant.LoanStatusApproved,
+			CreatedAt:  param.DateOfApproval,
+		}
+	}
+
+	return loanlogAdapter.LoanLog{
+		LoanID:     int64(param.LoanID),
+		EmployeeID: sql.NullInt64{Valid: true, Int64: int64(param.EmployeeID)},
+		Status:     constant.LoanStatusDisbursed,
+		CreatedAt:  param.DateOfDisbursement,
+	}
 }

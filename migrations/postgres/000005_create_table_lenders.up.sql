@@ -14,4 +14,6 @@ BEGIN;
     CREATE INDEX idx_lender_guid ON lenders(guid);
 
     INSERT INTO lenders (first_name, last_name) VALUES ('Lender', 'One');
+    INSERT INTO lenders (first_name, last_name) VALUES ('Lender', 'Two');
+    INSERT INTO lenders (first_name, last_name) VALUES ('Lender', 'Three');
 COMMIT;

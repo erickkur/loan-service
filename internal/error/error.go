@@ -14,7 +14,9 @@ const ServiceID = "1"
 
 // Table prefix error code
 const (
-	LoanPrefix = "001"
+	LoanPrefix       = "001"
+	LoanLogPrefix    = "002"
+	LenderLoanPrefix = "003"
 )
 
 // Own validation error code

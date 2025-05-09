@@ -3,8 +3,6 @@ package logger
 import (
 	"fmt"
 
-	"github.com/loan-service/internal/env"
-
 	"go.uber.org/zap"
 )
 
@@ -14,37 +12,20 @@ type Logger struct {
 
 func New() *Logger {
 	var l Logger
-	if env.Env() == "local" {
-		config := zap.NewDevelopmentConfig()
-		config.DisableStacktrace = true
 
-		logger, err := config.Build()
-		if err != nil {
-			fmt.Println("Failed to initiate logger", err)
-
-			return nil
-		}
-
-		l = Logger{
-			zapLogger: logger,
-		}
-
-		return &l
-	}
-
-	config := zap.NewProductionConfig()
+	config := zap.NewDevelopmentConfig()
 	config.DisableStacktrace = true
 
 	logger, err := config.Build()
 	if err != nil {
 		fmt.Println("Failed to initiate logger", err)
-
 		return nil
 	}
 
 	l = Logger{
 		zapLogger: logger,
 	}
+
 	return &l
 }
 

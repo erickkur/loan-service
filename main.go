@@ -17,10 +17,15 @@ import (
 	pg "github.com/loan-service/adapter/database/postgres"
 	bwModel "github.com/loan-service/adapter/models/borrower"
 	eModel "github.com/loan-service/adapter/models/employee"
+	leModel "github.com/loan-service/adapter/models/lender"
+	lelonModel "github.com/loan-service/adapter/models/lenderloan"
 	lModel "github.com/loan-service/adapter/models/loan"
 	llogModel "github.com/loan-service/adapter/models/loanlog"
+	lloanService "github.com/loan-service/application/services/lenderloan"
 	lService "github.com/loan-service/application/services/loan"
+	llogService "github.com/loan-service/application/services/loanlog"
 	rs "github.com/loan-service/application/services/router"
+	lloanDomain "github.com/loan-service/domain/lenderloan"
 	lDomain "github.com/loan-service/domain/loan"
 )
 
@@ -57,6 +62,8 @@ func run() error {
 	borrowerModel := bwModel.NewModel()
 	loanlog := llogModel.NewModel()
 	employeeModel := eModel.NewModel()
+	lenderModel := leModel.NewModel()
+	lenderLoanModel := lelonModel.NewModel()
 	// ++++++++++++++++++++++++++++++++++++++++++
 
 	// Service layer initialization
@@ -74,6 +81,17 @@ func run() error {
 		EmployeeModel: employeeModel,
 		DBClient:      postgresAdapter,
 	})
+
+	loanLogService := llogService.NewLoanLogService(llogService.Dependency{
+		LoanlogModel: loanlog,
+		DBClient:     postgresAdapter,
+	})
+
+	lenderLoanService := lloanService.NewLenderLoanService(lloanService.Dependency{
+		LenderLoanModel: lenderLoanModel,
+		LenderModel:     lenderModel,
+		DBClient:        postgresAdapter,
+	})
 	// ++++++++++++++++++++++++++++++++++++++++++
 
 	// Domain layer initialization
@@ -82,6 +100,14 @@ func run() error {
 		LoanService: loanService,
 		Context:     routerService,
 		Logger:      log,
+	})
+
+	lloanDomain.NewDomain(lloanDomain.RouteDependency{
+		LenderLoanService: lenderLoanService,
+		LoanService:       loanService,
+		LoanLogService:    loanLogService,
+		Context:           routerService,
+		Logger:            log,
 	})
 	// ++++++++++++++++++++++++++++++++++++++++++
 
