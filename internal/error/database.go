@@ -35,6 +35,16 @@ func (d DatabaseError) WrapError(domainCode string) JSONWrapError {
 		}
 	}
 
+	_, isCustomErrorInformation := d.error.(CustomErrorInformation)
+	if isCustomErrorInformation {
+		return JSONWrapError{
+			Error:   d.error,
+			Status:  http.StatusBadRequest,
+			Code:    generateErrorCode(domainCode, UnacceptedValueError),
+			Message: d.Error(),
+		}
+	}
+
 	return JSONWrapError{
 		Error:   d.error,
 		Status:  http.StatusInternalServerError,

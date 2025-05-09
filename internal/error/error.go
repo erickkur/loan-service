@@ -21,6 +21,7 @@ const (
 const (
 	UnknownValidationError = "500"
 	ValidationDataError    = "501"
+	UnacceptedValueError   = "502"
 )
 
 // General error code
