@@ -18,7 +18,7 @@ func TestCreateLenderLoanRequest_Validate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Where loan guid is invalid, Then return Error",
+			name: "When loan guid is invalid, Then return Error",
 			fields: fields{
 				LoanGUID:       uuid.Nil,
 				LenderGUID:     uuid.Nil,
@@ -27,7 +27,7 @@ func TestCreateLenderLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where lender guid is invalid, Then return Error",
+			name: "When lender guid is invalid, Then return Error",
 			fields: fields{
 				LoanGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				LenderGUID:     uuid.Nil,
@@ -36,7 +36,7 @@ func TestCreateLenderLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where invested amount is 0, Then return Error",
+			name: "When invested amount is 0, Then return Error",
 			fields: fields{
 				LoanGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				LenderGUID:     uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e11"),

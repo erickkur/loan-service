@@ -23,7 +23,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Where request status is invalid, Then return error",
+			name: "When request status is invalid, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "invalid",
@@ -36,7 +36,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is approved and pictureProof is empty, Then return error",
+			name: "When request status is approved and pictureProof is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "approved",
@@ -49,7 +49,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is approved and pictureProof is not image, Then return error",
+			name: "When request status is approved and pictureProof is not image, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "approved",
@@ -62,7 +62,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is approved and employeeGUID is empty, Then return error",
+			name: "When request status is approved and employeeGUID is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "approved",
@@ -75,7 +75,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is approved and dateOfApproval is empty, Then return error",
+			name: "When request status is approved and dateOfApproval is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "approved",
@@ -88,7 +88,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is disbursed and agreementLetter is empty, Then return error",
+			name: "When request status is disbursed and agreementLetter is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "disbursed",
@@ -101,7 +101,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is disbursed and agreementLetter extension is not pdf, Then return error",
+			name: "When request status is disbursed and agreementLetter extension is not pdf, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "disbursed",
@@ -114,7 +114,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is disbursed and employee guid is empty, Then return error",
+			name: "When request status is disbursed and employee guid is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "disbursed",
@@ -127,7 +127,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is disbursed and date of disbursement is empty, Then return error",
+			name: "When request status is disbursed and date of disbursement is empty, Then return error",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "disbursed",
@@ -140,7 +140,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where request status is approved and all information is valid, Then return success",
+			name: "When request status is approved and all information is valid, Then return success",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "approved",
@@ -153,7 +153,7 @@ func TestUpdateLoanRequest_Validate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Where request status is disbursed and all information is valid, Then return success",
+			name: "When request status is disbursed and all information is valid, Then return success",
 			fields: fields{
 				LoanGUID:           nil,
 				Status:             "disbursed",
@@ -198,7 +198,7 @@ func TestCreateLoanRequest_Validate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Where borrowerGUID is null, Then return error",
+			name: "When borrowerGUID is null, Then return error",
 			fields: fields{
 				BorrowerGUID:       uuid.Nil,
 				PrincipalAmount:    0,
@@ -208,7 +208,7 @@ func TestCreateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where principalAmount is 0, Then return error",
+			name: "When principalAmount is 0, Then return error",
 			fields: fields{
 				BorrowerGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				PrincipalAmount:    0,
@@ -218,7 +218,7 @@ func TestCreateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where Rate is 0, Then return error",
+			name: "When Rate is 0, Then return error",
 			fields: fields{
 				BorrowerGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				PrincipalAmount:    20000000,
@@ -228,7 +228,7 @@ func TestCreateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where returnOfInvestment is 0, Then return error",
+			name: "When returnOfInvestment is 0, Then return error",
 			fields: fields{
 				BorrowerGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				PrincipalAmount:    20000000,
@@ -238,7 +238,7 @@ func TestCreateLoanRequest_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Where all information is valid, Then return Success",
+			name: "When all information is valid, Then return Success",
 			fields: fields{
 				BorrowerGUID:       uuid.MustParse("b3a6d7e2-2f8b-4e9e-9c0e-6f3e2e1e1e1e"),
 				PrincipalAmount:    20000000,
