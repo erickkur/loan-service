@@ -15,7 +15,9 @@ import (
 	"github.com/loan-service/internal/logger"
 
 	pg "github.com/loan-service/adapter/database/postgres"
+	bwModel "github.com/loan-service/adapter/models/borrower"
 	lModel "github.com/loan-service/adapter/models/loan"
+	llogModel "github.com/loan-service/adapter/models/loanlog"
 	lService "github.com/loan-service/application/services/loan"
 	rs "github.com/loan-service/application/services/router"
 	lDomain "github.com/loan-service/domain/loan"
@@ -51,6 +53,8 @@ func run() error {
 	postgresAdapter := pg.NewAdapter(infraObj.Database)
 
 	loanModel := lModel.NewModel()
+	borrowerModel := bwModel.NewModel()
+	loanlog := llogModel.NewModel()
 	// ++++++++++++++++++++++++++++++++++++++++++
 
 	// Service layer initialization
@@ -62,8 +66,10 @@ func run() error {
 		"/api")
 
 	loanService := lService.NewLoanService(lService.Dependency{
-		LoanModel: loanModel,
-		DBClient:  postgresAdapter,
+		LoanModel:     loanModel,
+		BorrowerModel: borrowerModel,
+		LoanLogModel:  loanlog,
+		DBClient:      postgresAdapter,
 	})
 	// ++++++++++++++++++++++++++++++++++++++++++
 

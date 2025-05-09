@@ -1,10 +1,12 @@
 package loan
 
 import (
-	model "github.com/loan-service/adapter/models/loan"
+	"context"
+
+	loanAdapter "github.com/loan-service/adapter/models/loan"
 	"github.com/loan-service/application/dto"
 )
 
 type LoanServiceInterface interface {
-	CreateLoan(request dto.CreateLoanRequest) (*model.Loan, error)
+	CreateLoan(ctx context.Context, request dto.CreateLoanRequest) (*loanAdapter.Loan, error)
 }

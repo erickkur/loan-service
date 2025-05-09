@@ -1,25 +1,26 @@
 package dto
 
 import (
+	"github.com/google/uuid"
 	"github.com/loan-service/internal/constant"
 	errs "github.com/loan-service/internal/error"
 )
 
 type CreateLoanRequest struct {
-	BorrowerID         int64   `json:"borrowerID"`
-	PrincipalAmount    float64 `json:"principalAmount"`
-	Rate               float64 `json:"rate"`
-	ReturnOfInvestment float64 `json:"returnOfInvestment"`
+	BorrowerGUID       uuid.UUID `json:"borrowerGUID"`
+	PrincipalAmount    float64   `json:"principalAmount"`
+	Rate               float64   `json:"rate"`
+	ReturnOfInvestment float64   `json:"returnOfInvestment"`
 }
 
 type CreateLoanResponse struct {
-	ID int `json:"id"`
+	GUID uuid.UUID `json:"guid"`
 }
 
 func (r CreateLoanRequest) Validate() error {
 	var invalidFields []string
-	if r.BorrowerID == 0 {
-		invalidFields = append(invalidFields, "borrowerID")
+	if r.BorrowerGUID == uuid.Nil {
+		invalidFields = append(invalidFields, "borrowerGUID")
 	}
 
 	if r.PrincipalAmount == 0 {

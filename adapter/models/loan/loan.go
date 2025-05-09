@@ -2,19 +2,22 @@ package loan
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/google/uuid"
 	pg "github.com/loan-service/adapter/database/postgres"
 	"github.com/loan-service/adapter/models/recordtimestamp"
 	"github.com/uptrace/bun"
 )
 
 type Loan struct {
-	ID                  int     `bun:",pk,autoincrement"`
-	BorrowerID          int64   `json:"borrower_id"`
-	PrincipalAmount     float64 `json:"principal_amount"`
-	Rate                float64 `json:"rate"`
-	ReturnOfInvestment  float64 `json:"return_of_investment"`
-	AgreementLetterLink string  `json:"agreement_letter_link"`
+	ID                  int            `bun:",pk,autoincrement"`
+	GUID                uuid.UUID      `bun:",nullzero"`
+	BorrowerID          int64          `bun:",notnull"`
+	PrincipalAmount     float64        `bun:",notnull"`
+	Rate                float64        `bun:",notnull"`
+	ReturnOfInvestment  float64        `bun:",notnull"`
+	AgreementLetterLink sql.NullString `bun:""`
 
 	recordtimestamp.RecordTimestamp
 

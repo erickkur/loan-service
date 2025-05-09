@@ -1,6 +1,8 @@
 package loan
 
 import (
+	"context"
+
 	"github.com/loan-service/application/dto"
 	lService "github.com/loan-service/application/services/loan"
 	errs "github.com/loan-service/internal/error"
@@ -20,20 +22,20 @@ func NewEntity(d EntityDependency) Entity {
 	}
 }
 
-func (l Entity) CreateLoan(request dto.CreateLoanRequest) (*dto.CreateLoanResponse, *errs.JSONWrapError) {
+func (l Entity) CreateLoan(ctx context.Context, request dto.CreateLoanRequest) (*dto.CreateLoanResponse, *errs.JSONWrapError) {
 	err := request.Validate()
 	if err != nil {
 		jsonWrapErr := errs.NewValidationError(err).WrapError(errs.LoanPrefix)
 		return nil, &jsonWrapErr
 	}
 
-	loan, err := l.loanService.CreateLoan(request)
+	loan, err := l.loanService.CreateLoan(ctx, request)
 	if err != nil {
 		jsonWrapErr := errs.NewDatabaseError(err).WrapError(errs.LoanPrefix)
 		return nil, &jsonWrapErr
 	}
 
 	return &dto.CreateLoanResponse{
-		ID: loan.ID,
+		GUID: loan.GUID,
 	}, nil
 }

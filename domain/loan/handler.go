@@ -44,6 +44,8 @@ func NewHandler(d HandlerDependency) Handler {
 
 func (h Handler) CreateLoanHandler() handler.EndpointHandler {
 	return func(rw http.ResponseWriter, r *http.Request) handler.ResponseInterface {
+		ctx := r.Context()
+
 		var request dto.CreateLoanRequest
 
 		err := json.DecodeBody(&request, r.Body)
@@ -52,7 +54,7 @@ func (h Handler) CreateLoanHandler() handler.EndpointHandler {
 			return h.resp.ImportJSONWrapError(&decodingErr)
 		}
 
-		response, jsonWebErr := h.entity.CreateLoan(request)
+		response, jsonWebErr := h.entity.CreateLoan(ctx, request)
 		if jsonWebErr != nil {
 			return h.resp.ImportJSONWrapError(jsonWebErr)
 		}

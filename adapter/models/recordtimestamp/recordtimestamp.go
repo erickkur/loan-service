@@ -8,20 +8,17 @@ import (
 )
 
 type RecordTimestamp struct {
-	CreatedAt time.Time
-	UpdatedAt bun.NullTime
+	CreatedAt time.Time    `bun:",,default:now()"`
+	UpdatedAt time.Time    `bun:",,default:now()"`
 	DeletedAt bun.NullTime `bun:",soft_delete,nullzero"`
 }
 
 var _ bun.BeforeAppendModelHook = (*RecordTimestamp)(nil)
 
 func (recordTimestamp *RecordTimestamp) BeforeAppendModel(ctx context.Context, query bun.Query) error {
-	switch query.(type) {
-	case *bun.InsertQuery:
-		recordTimestamp.CreatedAt = time.Now()
-		recordTimestamp.UpdatedAt = bun.NullTime{Time: time.Now()}
-	case *bun.UpdateQuery:
-		recordTimestamp.UpdatedAt = bun.NullTime{Time: time.Now()}
+	if _, ok := query.(*bun.UpdateQuery); ok {
+		recordTimestamp.UpdatedAt = time.Now()
 	}
+
 	return nil
 }
