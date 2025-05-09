@@ -1,6 +1,10 @@
 package dto
 
 import (
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/loan-service/internal/constant"
 	errs "github.com/loan-service/internal/error"
@@ -8,12 +12,16 @@ import (
 
 type CreateLoanRequest struct {
 	BorrowerGUID       uuid.UUID `json:"borrowerGUID"`
-	PrincipalAmount    float64   `json:"principalAmount"`
+	PrincipalAmount    int64     `json:"principalAmount"`
 	Rate               float64   `json:"rate"`
-	ReturnOfInvestment float64   `json:"returnOfInvestment"`
+	ReturnOfInvestment int64     `json:"returnOfInvestment"`
 }
 
 type CreateLoanResponse struct {
+	GUID uuid.UUID `json:"guid"`
+}
+
+type UpdateLoanResponse struct {
 	GUID uuid.UUID `json:"guid"`
 }
 
@@ -43,17 +51,58 @@ func (r CreateLoanRequest) Validate() error {
 }
 
 type UpdateLoanRequest struct {
-	Status string `json:"status,omitempty"`
+	LoanGUID       *uuid.UUID `json:"loanGUID"`
+	Status         string     `json:"status"`
+	PictureProof   string     `json:"pictureProof"`
+	EmployeeGUID   uuid.UUID  `json:"employeeGUID"`
+	DateOfApproval time.Time  `json:"dateOfApproval"`
 }
 
 func isLoanStatusExist(status string) bool {
-	return status != constant.LoanStatusApproved && status != constant.LoanStatusInvested && status != constant.LoanStatusDisbursed
+	return status == constant.LoanStatusApproved || status == constant.LoanStatusInvested || status == constant.LoanStatusDisbursed
+}
+
+func checkLoanStatusCanBeProcessToApproved(r UpdateLoanRequest) []string {
+	var invalidFields []string
+
+	if r.PictureProof == "" {
+		invalidFields = append(invalidFields, "pictureProof")
+	}
+
+	if !isImageFile(r.PictureProof) {
+		invalidFields = append(invalidFields, "pictureProof")
+	}
+
+	if r.EmployeeGUID == uuid.Nil {
+		invalidFields = append(invalidFields, "employeeGUID")
+	}
+
+	if r.DateOfApproval.IsZero() {
+		invalidFields = append(invalidFields, "dateOfApproval")
+	}
+
+	return invalidFields
+}
+
+func isImageFile(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg":
+		return true
+	default:
+		return false
+	}
 }
 
 func (r UpdateLoanRequest) Validate() error {
 	var invalidFields []string
 	if !isLoanStatusExist(r.Status) {
-		invalidFields = append(invalidFields, "loan_status")
+		return errs.ValidationAcceptedValue{Field: "status"}
+	}
+
+	invalidFields = checkLoanStatusCanBeProcessToApproved(r)
+	if len(invalidFields) > 0 {
+		return errs.ValidationRequiredData{InvalidFields: invalidFields}
 	}
 
 	return nil

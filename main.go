@@ -16,6 +16,7 @@ import (
 
 	pg "github.com/loan-service/adapter/database/postgres"
 	bwModel "github.com/loan-service/adapter/models/borrower"
+	eModel "github.com/loan-service/adapter/models/employee"
 	lModel "github.com/loan-service/adapter/models/loan"
 	llogModel "github.com/loan-service/adapter/models/loanlog"
 	lService "github.com/loan-service/application/services/loan"
@@ -55,6 +56,7 @@ func run() error {
 	loanModel := lModel.NewModel()
 	borrowerModel := bwModel.NewModel()
 	loanlog := llogModel.NewModel()
+	employeeModel := eModel.NewModel()
 	// ++++++++++++++++++++++++++++++++++++++++++
 
 	// Service layer initialization
@@ -69,6 +71,7 @@ func run() error {
 		LoanModel:     loanModel,
 		BorrowerModel: borrowerModel,
 		LoanLogModel:  loanlog,
+		EmployeeModel: employeeModel,
 		DBClient:      postgresAdapter,
 	})
 	// ++++++++++++++++++++++++++++++++++++++++++

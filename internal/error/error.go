@@ -56,12 +56,20 @@ type ValidationAcceptedValue struct {
 	Field string
 }
 
+type CustomErrorInformation struct {
+	ErrorInformation string
+}
+
 func (e ValidationRequiredData) Error() string {
 	return fmt.Sprintf("The following fields is required: %s", strings.Join(e.InvalidFields[:], ","))
 }
 
 func (e ValidationAcceptedValue) Error() string {
 	return fmt.Sprintf("Unaccepted value on param %s", e.Field)
+}
+
+func (e CustomErrorInformation) Error() string {
+	return e.ErrorInformation
 }
 
 func generateErrorCode(domainCode string, suffixCode string) int {

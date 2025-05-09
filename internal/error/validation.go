@@ -12,8 +12,9 @@ func NewValidationError(error error) ValidationError {
 
 func (v ValidationError) WrapError(domainCode string) JSONWrapError {
 	_, isValidationRequiredData := v.error.(ValidationRequiredData)
+	_, isValidationAcceptedValue := v.error.(ValidationAcceptedValue)
 
-	if isValidationRequiredData {
+	if isValidationRequiredData || isValidationAcceptedValue {
 		return JSONWrapError{
 			Error:   v.error,
 			Status:  http.StatusBadRequest,

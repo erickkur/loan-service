@@ -3,6 +3,7 @@ package loan
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/loan-service/application/dto"
 	lService "github.com/loan-service/application/services/loan"
 	rs "github.com/loan-service/application/services/router"
@@ -60,5 +61,34 @@ func (h Handler) CreateLoanHandler() handler.EndpointHandler {
 		}
 
 		return h.resp.SetOkWithStatus(http.StatusCreated, &response)
+	}
+}
+
+func (h Handler) UpdateLoanHandler() handler.EndpointHandler {
+	return func(rw http.ResponseWriter, r *http.Request) handler.ResponseInterface {
+		ctx := r.Context()
+
+		requestedGUID := h.context.Helper.GetParam(ctx, "guid")
+		loanGUID, parseErr := uuid.Parse(requestedGUID)
+		if parseErr != nil {
+			jsonWebErr := errs.NewDecoderError(parseErr).WrapError(errs.LoanPrefix)
+			return h.resp.ImportJSONWrapError(&jsonWebErr)
+		}
+
+		var request dto.UpdateLoanRequest
+		err := json.DecodeBody(&request, r.Body)
+		if err != nil {
+			decodingErr := err.WrapError(errs.LoanPrefix)
+			return h.resp.ImportJSONWrapError(&decodingErr)
+		}
+
+		request.LoanGUID = &loanGUID
+
+		response, jsonWebErr := h.entity.UpdateLoan(ctx, request)
+		if jsonWebErr != nil {
+			return h.resp.ImportJSONWrapError(jsonWebErr)
+		}
+
+		return h.resp.SetOkWithStatus(http.StatusOK, &response)
 	}
 }

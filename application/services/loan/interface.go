@@ -9,4 +9,5 @@ import (
 
 type LoanServiceInterface interface {
 	CreateLoan(ctx context.Context, request dto.CreateLoanRequest) (*loanAdapter.Loan, error)
+	UpdateLoanToApproved(ctx context.Context, request dto.UpdateLoanRequest) (*loanAdapter.Loan, error)
 }

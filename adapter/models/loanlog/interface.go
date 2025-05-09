@@ -12,4 +12,9 @@ type LoanLogModelInterface interface {
 		ctx context.Context,
 		lg LoanLog,
 	) (*LoanLog, error)
+	GetLatestLoanLog(
+		dbClient pg.DatabaseAdapterInterface,
+		ctx context.Context,
+		loanID int64,
+	) (*LoanLog, error)
 }

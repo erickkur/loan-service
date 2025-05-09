@@ -3,7 +3,6 @@ package loanlog
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,7 +35,6 @@ func (m *LoanLogModel) CreateLoanLog(
 ) (*LoanLog, error) {
 	db, err := dbClient.Get()
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -44,7 +42,32 @@ func (m *LoanLogModel) CreateLoanLog(
 		NewInsert().
 		Model(&lg)
 	_, err = query.Exec(ctx)
-	fmt.Println(err)
 
 	return &lg, err
+}
+
+func (m *LoanLogModel) GetLatestLoanLog(
+	dbClient pg.DatabaseAdapterInterface,
+	ctx context.Context,
+	loanID int64,
+) (*LoanLog, error) {
+	var ll LoanLog
+
+	db, err := dbClient.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	query := db.GetConnectionDB().
+		NewSelect().
+		Model(&ll).
+		Where("loan_id = ?", loanID).
+		Order("id desc").
+		Limit(1)
+	err = query.Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ll, nil
 }

@@ -14,9 +14,9 @@ type Loan struct {
 	ID                  int            `bun:",pk,autoincrement"`
 	GUID                uuid.UUID      `bun:",nullzero"`
 	BorrowerID          int64          `bun:",notnull"`
-	PrincipalAmount     float64        `bun:",notnull"`
+	PrincipalAmount     int64          `bun:",notnull"`
 	Rate                float64        `bun:",notnull"`
-	ReturnOfInvestment  float64        `bun:",notnull"`
+	ReturnOfInvestment  int64          `bun:",notnull"`
 	AgreementLetterLink sql.NullString `bun:""`
 
 	recordtimestamp.RecordTimestamp
@@ -47,4 +47,27 @@ func (m *LoanModel) CreateLoan(
 	_, err = query.Exec(ctx)
 
 	return &l, err
+}
+
+func (b *LoanModel) GetLoanByGUID(
+	dbClient pg.DatabaseAdapterInterface,
+	ctx context.Context,
+	guid uuid.UUID,
+) (*Loan, error) {
+	var l Loan
+	db, err := dbClient.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	query := db.GetConnectionDB().
+		NewSelect().
+		Model(&l).
+		Where("guid = ?", guid)
+	err = query.Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &l, nil
 }

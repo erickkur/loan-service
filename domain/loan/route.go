@@ -35,6 +35,7 @@ func (r Route) InitEndpoints() {
 	})
 
 	r.Context.RegisterEndpoint(r.CreateLoanEndpoint(h))
+	r.Context.RegisterEndpoint(r.UpdateLoanEndpoint(h))
 }
 
 func (r Route) CreateLoanEndpoint(h Handler) rs.EndpointInfo {
@@ -42,6 +43,17 @@ func (r Route) CreateLoanEndpoint(h Handler) rs.EndpointInfo {
 		HTTPMethod: http.MethodPost,
 		URLPattern: "/loans",
 		Handler:    h.CreateLoanHandler(),
+		Verifications: []cs.VerificationType{
+			cs.VerificationTypeConstants.AppToken,
+		},
+	}
+}
+
+func (r Route) UpdateLoanEndpoint(h Handler) rs.EndpointInfo {
+	return rs.EndpointInfo{
+		HTTPMethod: http.MethodPatch,
+		URLPattern: "/loans/:guid",
+		Handler:    h.UpdateLoanHandler(),
 		Verifications: []cs.VerificationType{
 			cs.VerificationTypeConstants.AppToken,
 		},
