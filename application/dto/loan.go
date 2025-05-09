@@ -76,7 +76,7 @@ func checkLoanStatusCanBeProcessToApproved(r UpdateLoanRequest) []string {
 	}
 
 	if !isImageFile(r.PictureProof) {
-		invalidFields = append(invalidFields, "agreementLetter extension must be image")
+		invalidFields = append(invalidFields, "pictureProof extension must be image")
 	}
 
 	if r.EmployeeGUID == uuid.Nil {
