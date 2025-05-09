@@ -18,4 +18,10 @@ type LoanModelInterface interface {
 		ctx context.Context,
 		guid uuid.UUID,
 	) (*Loan, error)
+	UpdateLoanAgrrementLetter(
+		dbClient pg.DatabaseAdapterInterface,
+		ctx context.Context,
+		loanID int,
+		aggrementLetter string,
+	) error
 }

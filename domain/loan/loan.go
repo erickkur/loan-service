@@ -50,8 +50,8 @@ func (l Entity) UpdateLoan(ctx context.Context, request dto.UpdateLoanRequest) (
 		return nil, &jsonWrapErr
 	}
 
-	if request.Status == constant.LoanStatusApproved {
-		loan, err := l.loanService.UpdateLoanToApproved(ctx, request)
+	if request.Status == constant.LoanStatusApproved || request.Status == constant.LoanStatusDisbursed {
+		loan, err := l.loanService.UpdateLoanToApprovedOrDisbursed(ctx, request)
 		if err != nil {
 			jsonWrapErr := errs.NewDatabaseError(err).WrapError(errs.LoanPrefix)
 			return nil, &jsonWrapErr

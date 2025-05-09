@@ -71,3 +71,24 @@ func (b *LoanModel) GetLoanByGUID(
 
 	return &l, nil
 }
+
+func (b *LoanModel) UpdateLoanAgrrementLetter(
+	dbClient pg.DatabaseAdapterInterface,
+	ctx context.Context,
+	loanID int,
+	aggrementLetter string,
+) error {
+	db, err := dbClient.Get()
+	if err != nil {
+		return err
+	}
+
+	query := db.GetConnectionDB().
+		NewUpdate().
+		Model(&Loan{}).
+		Where("id = ?", loanID).
+		Set("agreement_letter_link = ?", aggrementLetter)
+	_, err = query.Exec(ctx)
+
+	return err
+}

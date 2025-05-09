@@ -51,11 +51,13 @@ func (r CreateLoanRequest) Validate() error {
 }
 
 type UpdateLoanRequest struct {
-	LoanGUID       *uuid.UUID `json:"loanGUID"`
-	Status         string     `json:"status"`
-	PictureProof   string     `json:"pictureProof"`
-	EmployeeGUID   uuid.UUID  `json:"employeeGUID"`
-	DateOfApproval time.Time  `json:"dateOfApproval"`
+	LoanGUID           *uuid.UUID `json:"loanGUID"`
+	Status             string     `json:"status"`
+	PictureProof       string     `json:"pictureProof"`
+	EmployeeGUID       uuid.UUID  `json:"employeeGUID"`
+	DateOfApproval     time.Time  `json:"dateOfApproval"`
+	DateOfDisbursement time.Time  `json:"dateOfDisbursement"`
+	AgreementLetter    string     `json:"agreementLetter"`
 }
 
 func isLoanStatusExist(status string) bool {
@@ -65,12 +67,16 @@ func isLoanStatusExist(status string) bool {
 func checkLoanStatusCanBeProcessToApproved(r UpdateLoanRequest) []string {
 	var invalidFields []string
 
+	if r.Status != constant.LoanStatusApproved {
+		return invalidFields
+	}
+
 	if r.PictureProof == "" {
 		invalidFields = append(invalidFields, "pictureProof")
 	}
 
 	if !isImageFile(r.PictureProof) {
-		invalidFields = append(invalidFields, "pictureProof")
+		invalidFields = append(invalidFields, "agreementLetter extension must be image")
 	}
 
 	if r.EmployeeGUID == uuid.Nil {
@@ -79,6 +85,32 @@ func checkLoanStatusCanBeProcessToApproved(r UpdateLoanRequest) []string {
 
 	if r.DateOfApproval.IsZero() {
 		invalidFields = append(invalidFields, "dateOfApproval")
+	}
+
+	return invalidFields
+}
+
+func checkLoanStatusCanBeProcessToDisbursed(r UpdateLoanRequest) []string {
+	var invalidFields []string
+
+	if r.Status != constant.LoanStatusDisbursed {
+		return invalidFields
+	}
+
+	if r.AgreementLetter == "" {
+		invalidFields = append(invalidFields, "agreementLetter")
+	}
+
+	if !isPDFFile(r.AgreementLetter) {
+		invalidFields = append(invalidFields, "agreementLetter extension must be .pdf")
+	}
+
+	if r.EmployeeGUID == uuid.Nil {
+		invalidFields = append(invalidFields, "employeeGUID")
+	}
+
+	if r.DateOfDisbursement.IsZero() {
+		invalidFields = append(invalidFields, "dateOfDisbursement")
 	}
 
 	return invalidFields
@@ -94,6 +126,16 @@ func isImageFile(filename string) bool {
 	}
 }
 
+func isPDFFile(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+
+	if ext == ".pdf" {
+		return true
+	}
+
+	return false
+}
+
 func (r UpdateLoanRequest) Validate() error {
 	var invalidFields []string
 	if !isLoanStatusExist(r.Status) {
@@ -101,6 +143,11 @@ func (r UpdateLoanRequest) Validate() error {
 	}
 
 	invalidFields = checkLoanStatusCanBeProcessToApproved(r)
+	if len(invalidFields) > 0 {
+		return errs.ValidationRequiredData{InvalidFields: invalidFields}
+	}
+
+	invalidFields = checkLoanStatusCanBeProcessToDisbursed(r)
 	if len(invalidFields) > 0 {
 		return errs.ValidationRequiredData{InvalidFields: invalidFields}
 	}
