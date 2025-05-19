@@ -11,7 +11,6 @@ import (
 )
 
 // Context ...
-// tambahin logger di  context uber
 type Context struct {
 	router     httpserver.RouterInterface
 	middleware *ma.Middleware
